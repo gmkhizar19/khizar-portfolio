@@ -19,6 +19,64 @@ Verify both from a logged-out browser window, not from an account that owns them
 
 ---
 
+## Copy for the submission form
+
+Paste these as-is once the URLs above are filled in.
+
+**Project title**
+
+> Break the Network — a DevOps portfolio built on a real research graph
+
+**One-line summary**
+
+> A DevOps portfolio whose centrepiece is a playable cascade-failure game on 380 real
+> co-authorship edges, deployed on AWS Amplify.
+
+**Short description (≈80 words)**
+
+> Most portfolios describe what someone can do; this one lets you test it. "Break the
+> Network" is a cascade simulation played on a real 380-author slice of Pakistan's
+> computer-science research network, built from the OpenAlex API. Remove an author, watch
+> connectivity collapse, and try to beat the greedy baseline of 53.2% isolation in eight
+> moves. The site runs on AWS Amplify Hosting, with an optional API Gateway + Lambda +
+> DynamoDB leaderboard that validates every score and falls back to offline instead of
+> failing.
+
+**Longer description (≈250 words)**
+
+> I study computer science and want to work on the part of software that has to stay up, so
+> I built a portfolio that demonstrates that rather than claiming it.
+>
+> The centrepiece is a game. Over a semester I built a co-authorship graph of Pakistan's
+> computer-science research from the OpenAlex API: 26,627 records cleaned into 26,188
+> papers, 42,774 authors and 170,700 edges, loaded into a containerised Neo4j instance and
+> analysed with graph data science. A measured finding from that work is that 670
+> articulation points and 660 bridges hold the network together, but removing 10% of
+> authors by betweenness only takes the largest component from 92.6% to 76.3%. That gap is
+> counter-intuitive, so instead of writing it in a bullet point I made it playable: 380 real
+> authors, 1,895 real edges, eight removals, and a visible target of 53.2% isolation set by
+> greedy adversarial play.
+>
+> Everything around it is engineering, not decoration. The bundle is static React deployed
+> through Amplify Hosting from GitHub, so a push rebuilds and publishes atomically. The
+> leaderboard is an API Gateway HTTP API in front of one Node.js Lambda and a DynamoDB
+> table: scores are validated against the shipped dataset, callers are rate-limited by a
+> salted hash rather than a stored address, and if the backend is unreachable the page says
+> so and keeps playing.
+>
+> The whole pipeline is reproducible: `npm run verify` type-checks, runs 30 tests, builds,
+> audits the bundle size, checks WCAG contrast on the real theme tokens, and verifies the
+> leaderboard contract.
+
+**AWS services used**
+
+> AWS Amplify Hosting (build, CDN, HTTPS, atomic deploys) · Amazon API Gateway HTTP API
+> (two routes, CORS locked to the site origin, stage throttling) · AWS Lambda (Node.js 20,
+> arm64 — validation, ranking, rate limiting) · Amazon DynamoDB (single on-demand table,
+> TTL for throttle counters) · Amazon CloudWatch Logs · AWS IAM (scoped policy).
+
+---
+
 ## The three required sections
 
 | Requirement | Where it is | How a judge sees it in ten seconds |
