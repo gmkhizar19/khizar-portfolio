@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Khizar portfolio leaderboard. One HTTP API, one Lambda, one DynamoDB table.
+  Everything is on-demand or pay-per-request, so the idle cost of this stack is zero.
+
+Parameters:
+  SiteOrigin:
+    Type: String
+    Default: http://localhost:4173
+    Description: >
+      Exact origin of the deployed site (scheme + host, no trailing slash). Used for the
+      CORS allow-list and injected into the frontend build as VITE_API_URL's origin.
+      Set this to the real Amplify domain.
+
+  IpSalt:
+    Type: String
+    NoEcho: true
+    Default: 7c1f9a4e2b8d6350f1a7c9e4b2d8f601
+    MinLength: 16
+    Description: >
+      Salt for hashing caller IP addresses. Only the salted hash is ever stored, never the
+      address itself. Change this before a real launch; the default exists so that
+      `sam deploy --guided` works with no questions.
+
+  ThrottlePerHour:
+    Type: Number
+    Default: 5
+    MinValue: 1
+    MaxValue: 100
+    Description: Maximum leaderboard submissions accepted per hashed caller per hour.
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Architectures: [arm64]
+    MemorySize: 256
+    Timeout: 5
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref LeaderboardTable
+        IP_SALT: !Ref IpSalt
+        THROTTLE_PER_HOUR: !Ref ThrottlePerHour
+        ALLOWED_ORIGIN: !Ref SiteOrigin
+
+Resources:
+  # ---------------------------------------------------------------------------
+  # Storage. One table, two item shapes: the leaderboard, and per-caller throttle
+  # counters. On-demand capacity means the bill for an idle portfolio is $0.00.
+  # ---------------------------------------------------------------------------
+  LeaderboardTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      # Throttle counters are worthless after the hour has passed. TTL reaps them
+      # automatically so the table does not grow with every visitor forever.
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      SSESpecification:
+        SSEDescription:
+          Status: ENABLED
+      Tags:
+        - Key: Project
+          Value: khizar-portfolio
+
+  # ---------------------------------------------------------------------------
+  # Compute. The handler is intentionally dependency-free: the nodejs20.x runtime
+  # already ships AWS SDK v3, so there is no bundle to build and no layer to manage.
+  # ---------------------------------------------------------------------------
+  LeaderboardFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: index.handler
+      Description: Validates game runs, rate limits by hashed caller, serves the top ten.
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref LeaderboardTable
+          IP_SALT: !Ref IpSalt
+          THROTTLE_PER_HOUR: !Ref ThrottlePerHour
+          ALLOWED_ORIGIN: !Ref SiteOrigin
+          # Node 20 on ARM: keep the process small and predictable.
+          NODE_OPTIONS: '--enable-source-maps'
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LeaderboardTable
+      Events:
+        SubmitRun:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LeaderboardApi
+            Path: /runs
+            Method: POST
+        Leaderboard:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LeaderboardApi
+            Path: /leaderboard
+            Method: GET
+
+  # ---------------------------------------------------------------------------
+  # Edge. HTTP API is ~70% cheaper than REST API and all we need: two routes, JSON
+  # in, JSON out. Throttling is set at stage level so a runaway script cannot run up
+  # a bill even if every other guard fails.
+  # ---------------------------------------------------------------------------
+  LeaderboardApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: prod
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref SiteOrigin
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - content-type
+        MaxAge: 86400
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+      Tags:
+        Project: khizar-portfolio
+
+Outputs:
+  ApiUrl:
+    Description: >
+      Base URL for the frontend. Put this in .env as VITE_API_URL. No trailing slash.
+    Value: !Sub 'https://${LeaderboardApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+
+  TableName:
+    Description: DynamoDB table holding leaderboard rows and throttle counters.
+    Value: !Ref LeaderboardTable
+
+  FunctionName:
+    Description: Lambda function name, for `aws logs tail`.
+    Value: !Ref LeaderboardFunction

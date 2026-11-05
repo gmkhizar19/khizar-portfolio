@@ -1,0 +1,44 @@
+{
+  "name": "khizar-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Portfolio of Ghulam Muhammad Khizar — built around a playable slice of a real 42,774-author research network.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "data": "node tools/export-network.mjs",
+    "budget": "node tools/check-budget.mjs",
+    "contrast": "node tools/check-contrast.mjs",
+    "lambda": "node tools/check-lambda.mjs",
+    "og": "node tools/make-og.mjs",
+    "verify": "npm run typecheck && npm run test && npm run build && npm run budget && npm run contrast && npm run lambda"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/puppeteer": "^4.14.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/inter-tight": "^5.2.5",
+    "@fontsource-variable/jetbrains-mono": "^5.2.5",
+    "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.2.5",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "puppeteer-core": "^25.16.0",
+    "typescript": "^5.8.3",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  }
+}

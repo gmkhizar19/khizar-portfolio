@@ -1,0 +1,13 @@
+# Keep the repository LF and the working copy LF, so the same bytes build on Windows and
+# on the Amplify builder (Linux). Without this, Git would check the files out as CRLF here
+# and every diff would be a whole-file rewrite.
+* text=auto eol=lf
+
+# Binary assets must never be normalised.
+*.png binary
+*.jpg binary
+*.woff2 binary
+*.ico binary
+
+# Lockfiles get no diff noise in review.
+package-lock.json text eol=lf

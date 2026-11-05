@@ -1,0 +1,427 @@
+/* ============================================================================
+   layout.css — navigation, hero, page rhythm, footer.
+   ========================================================================= */
+
+/* ------------------------------------------------------------------- nav */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--ink-950) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 68px;
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--bone-50);
+}
+
+.nav__brand svg {
+  color: var(--signal);
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  margin-left: 12px;
+}
+
+.nav__links a {
+  font-size: 0.9rem;
+  color: var(--bone-400);
+  text-decoration: none;
+  padding-block: 6px;
+  border-bottom: 1px solid transparent;
+  transition:
+    color var(--t-fast) var(--ease-standard),
+    border-color var(--t-fast) var(--ease-standard);
+}
+
+.nav__links a:hover {
+  color: var(--bone-50);
+  border-bottom-color: var(--signal);
+}
+
+.nav__cta {
+  margin-left: auto;
+}
+
+.nav__mobile {
+  display: none;
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------ hero */
+
+.hero {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-height: min(88svh, 780px);
+  padding-block: clamp(56px, 8vh, 96px) clamp(44px, 6vh, 64px);
+  overflow: hidden;
+}
+
+.hero__graph {
+  position: absolute;
+  inset: -6% -8% -6% 34%;
+  z-index: 0;
+  opacity: 0.62;
+  -webkit-mask-image: radial-gradient(closest-side at 62% 46%, #000 45%, transparent 82%);
+  mask-image: radial-gradient(closest-side at 62% 46%, #000 45%, transparent 82%);
+  pointer-events: none;
+}
+
+.hero-graph {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-graph__edges line {
+  stroke: rgba(159, 224, 210, 0.26);
+  stroke-width: 0.16;
+}
+
+.hero-graph__node {
+  fill: rgba(159, 224, 210, 0.95);
+}
+
+.hero-graph__node--pulse {
+  animation: node-pulse 5.5s var(--ease-standard) infinite;
+}
+
+@keyframes node-pulse {
+  0%,
+  100% {
+    fill: rgba(159, 224, 210, 0.55);
+  }
+  50% {
+    fill: rgba(217, 255, 102, 0.95);
+  }
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* 12-column dotted tick grid, aligned to the content container. */
+.grid12 {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: min(1200px, 100% - var(--gutter) * 2);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 96%);
+  mask-image: linear-gradient(180deg, #000 55%, transparent 96%);
+}
+
+.grid12 i {
+  border-left: 1px dotted rgba(245, 244, 250, 0.09);
+}
+
+.grid12 i:last-child {
+  border-right: 1px dotted rgba(245, 244, 250, 0.09);
+}
+
+@media (max-width: 720px) {
+  .grid12 {
+    display: none;
+  }
+}
+
+.hero__eyebrow {
+  margin-bottom: 22px;
+}
+
+.hero__title {
+  max-width: 18ch;
+  margin-bottom: 26px;
+}
+
+.hero__lede {
+  max-width: 48ch;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.hero__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 32px;
+  margin-top: clamp(32px, 5vh, 52px);
+  padding-top: 22px;
+  border-top: 1px solid var(--line-soft);
+  max-width: 560px;
+}
+
+.hero__stat dt {
+  order: 2;
+  margin-top: 6px;
+  color: var(--bone-500);
+}
+
+.hero__stat dd {
+  order: 1;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  color: var(--bone-50);
+}
+
+/* -------------------------------------------------------------- sections */
+
+.section-head .mono {
+  color: var(--signal-soft);
+}
+
+.about__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+.about__prose p {
+  color: var(--bone-200);
+  max-width: var(--measure);
+}
+
+.about__prose p + p {
+  margin-top: 18px;
+}
+
+.about__card {
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 40%),
+    var(--ink-900);
+}
+
+.about__card dl {
+  display: grid;
+  gap: 16px;
+}
+
+.about__card dt {
+  color: var(--bone-500);
+}
+
+.about__card dd {
+  margin-top: 4px;
+  color: var(--bone-200);
+  font-size: var(--text-small);
+}
+
+.about__finding {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.about__finding p:last-child {
+  margin-top: 8px;
+  font-size: var(--text-small);
+  color: var(--bone-400);
+}
+
+.principles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 40px);
+  margin-top: clamp(48px, 6vw, 72px);
+  padding-top: clamp(32px, 4vw, 48px);
+  border-top: 1px solid var(--line-soft);
+  list-style: none;
+  padding-inline: 0;
+}
+
+.principles h3 {
+  margin-bottom: 8px;
+  color: var(--bone-50);
+}
+
+.principles p {
+  color: var(--bone-400);
+  font-size: var(--text-small);
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.footer {
+  padding-block: clamp(56px, 8vh, 96px) 40px;
+  border-top: 1px solid var(--line);
+  background: var(--ink-900);
+}
+
+.footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: space-between;
+  align-items: end;
+  padding-bottom: clamp(40px, 6vw, 64px);
+}
+
+.footer h2 {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+  max-width: 18ch;
+}
+
+.footer__note {
+  margin-top: 12px;
+  color: var(--bone-400);
+}
+
+.footer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--bone-500);
+  font-size: 0.8125rem;
+}
+
+.footer__top-link {
+  color: var(--bone-300);
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 980px) {
+  .nav__links,
+  .nav__cta {
+    display: none;
+  }
+
+  .nav__mobile {
+    display: block;
+  }
+
+  .nav__mobile summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font-size: 0.875rem;
+    color: var(--bone-200);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .nav__mobile summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nav__mobile[open] summary {
+    border-color: var(--signal);
+  }
+
+  .nav__mobile nav {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(100% + 8px);
+    display: grid;
+    gap: 4px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--ink-850);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  }
+
+  .nav__mobile nav a {
+    padding: 12px 10px;
+    border-radius: var(--r-sm);
+    text-decoration: none;
+    color: var(--bone-200);
+  }
+
+  .nav__mobile nav a:hover {
+    background: var(--ink-800);
+  }
+
+  .nav__mobile-cta {
+    margin-top: 6px;
+    background: var(--signal);
+    color: var(--ink-950) !important;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .about__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .principles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero__graph {
+    inset: -10% -30% -10% 20%;
+    opacity: 0.34;
+  }
+}
+
+@media (max-width: 620px) {
+  .hero {
+    min-height: auto;
+    padding-block: 56px 48px;
+  }
+
+  .hero__title {
+    font-size: clamp(2.6rem, 13vw, 3.6rem);
+  }
+
+  .hero__stats {
+    gap: 20px 32px;
+  }
+
+  .footer__top {
+    align-items: start;
+  }
+}
+
+@media (min-width: 1800px) {
+  .hero__graph {
+    inset: -10% 0 -10% 40%;
+  }
+}

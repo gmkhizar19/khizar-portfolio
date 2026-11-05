@@ -1,0 +1,25 @@
+# Amplify Hosting build spec.
+#
+# Amplify runs each phase in a fresh container and then publishes `artifacts.baseDirectory`.
+# There is no server step: the output is static files, so the whole deploy is a CDN
+# publish. `npm ci` (not `npm install`) so the build uses the committed lockfile and a
+# dependency cannot drift between the machine that was tested and the one that ships.
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - node --version
+        - npm ci
+    build:
+      commands:
+        # VITE_API_URL is set in the Amplify console, not here: the same repo has to build
+        # without a leaderboard for previews and forks. vite.config.ts reads it.
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

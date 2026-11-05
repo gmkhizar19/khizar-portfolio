@@ -1,0 +1,8 @@
+{
+  "name": "khizar-portfolio-leaderboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Leaderboard handler. AWS SDK v3 is provided by the nodejs20.x runtime, so this deliberately declares no dependencies — there is no bundle to build and nothing to keep patched.",
+  "dependencies": {}
+}
