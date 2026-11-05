@@ -78,7 +78,18 @@ the section honestly reports that it is offline.
 ### One command
 
 Requires the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
-and configured credentials.
+and configured credentials. With the AWS CLI v2.39+ the credential step is:
+
+```
+aws login          # browser sign-in, no keys to paste
+```
+
+Older CLIs use `aws configure` with an access key and secret instead. Either way, confirm
+it worked before deploying:
+
+```
+aws sts get-caller-identity
+```
 
 ```
 cd infra
@@ -114,6 +125,32 @@ the Amplify console for the deployed site) and rebuild. That is the whole integr
 At portfolio traffic (tens of requests a day) the running cost is **$0.00**. The only way
 to spend money here is to leave a script hammering the endpoint, which is why stage-level
 throttling is set at 10 requests/second with a burst of 20.
+
+### Cost, stated precisely
+
+"Free tier" is two different things, and conflating them is how people get a surprise bill:
+
+| Type | Services here | What happens if the offer expires |
+|---|---|---|
+| **Always free** | Lambda (1M requests/month), DynamoDB storage (25 GB), CloudWatch Logs (5 GB) | Nothing. These have no expiry. |
+| **12 months from account creation** | Amplify Hosting (1,000 build min, 15 GB served), API Gateway HTTP API (1M requests) | Billing starts at $0.01/build-minute and $0.15/GB served. |
+
+So on an account older than a year, Amplify is **not** $0 — it is roughly $0.02 per deploy
+and a few cents a month at judge traffic. That is the honest number; it is not zero.
+
+To make that unmissable, create a budget that emails at 50% and 100% of **$1**:
+
+```
+aws budgets create-budget \
+  --account-id $(aws sts get-caller-identity --query Account --output text) \
+  --budget file://infra/budget.json \
+  --notifications-with-subscribers file://infra/budget-notifications.json
+```
+
+On PowerShell, use `Set-Location infra` first and pass `--budget file://budget.json`. AWS
+Budgets is free for the first two budgets per account. If the notification email never
+arrives, check the spam folder before assuming the alarm did not fire.
+
 
 ### Verify it works
 
